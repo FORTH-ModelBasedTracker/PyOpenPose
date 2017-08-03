@@ -13,10 +13,12 @@ Set and environment variable named OPENPOSE_ROOT pointing to the openpose root f
 
 Inside the root folder of PyOpenpose execute the following commands:
 
+```bash
 mkdir build
 cd build
 cmake ..
 make
+```
 
 Set your PYTHONPATH to point to the folder containing PyOpenPose.so
 
@@ -24,4 +26,3 @@ Set your PYTHONPATH to point to the folder containing PyOpenPose.so
 ### Testing
 
 Check the scripts folder for python examples using PyOpenPose.
-
