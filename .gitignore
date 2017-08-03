@@ -1,0 +1,32 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+.idea
+cmake-build-*
+media
+scripts/.ipynb_checkpoints
+model/*.blend1
+model/*.bbn
+model/*.btn
+model/*.bmesh
+model/*.json
+model/*.xml
+*.pyc
