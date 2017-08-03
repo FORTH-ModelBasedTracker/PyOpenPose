@@ -18,10 +18,6 @@ def showPAFs(PAFs, startIdx=0, endIdx=16):
         Y = PAFs[idx*2+1]
         tmp = np.dstack((X, Y, np.zeros_like(X)))
 
-        # tmp[X == 0] = 0
-        # print "tmp: ", np.min(tmp), np.max(tmp)
-        # bg = (hm[1] * 255).astype(np.ubyte)
-        # tmp = cv2.normalize(tmp, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1)
         cv2.imshow("PAF "+str(idx), tmp)
 
 
