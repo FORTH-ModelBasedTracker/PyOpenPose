@@ -9,9 +9,9 @@ https://github.com/CMU-Perceptual-Computing-Lab/openpose
 ### Building
 
 Clone and build openpose. I assume you will also build caffe inside openpose 3rdparty folder.
-Set and environment variable named OPENPOSE_ROOT pointing to the openpose root folder.
+Set an environment variable named OPENPOSE_ROOT pointing to the openpose root folder.
 
-Inside the root folder of PyOpenpose execute the following commands:
+Inside the root folder of PyOpenpose run cmake and build with:
 
 ```bash
 mkdir build
@@ -20,7 +20,7 @@ cmake ..
 make
 ```
 
-Set your PYTHONPATH to point to the folder containing PyOpenPose.so
+Add the folder containing PyOpenPose.so to your PYTHONPATH.
 
 
 ### Testing
