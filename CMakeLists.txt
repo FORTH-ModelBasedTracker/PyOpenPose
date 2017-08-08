@@ -50,6 +50,7 @@ find_package(CUDA REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost COMPONENTS system python REQUIRED)
 find_package(PythonLibs REQUIRED)
+find_package(Doxygen)
 
 # USE_CAFFE define needed by openpose headers
 if(DEFINED ENV{OPENPOSE_ROOT})
@@ -77,6 +78,9 @@ feature_summary(WHAT ALL)
 
 
 add_subdirectory(PyOpenPoseLib)
+if(DOXYGEN_FOUND)
+    add_subdirectory(doc)
+endif()
 
 # custom install target, needed for Clion IDE.
 add_custom_target(install_${PROJECT_NAME} $(MAKE) install COMMENT "Installing ${PROJECT_NAME}")
