@@ -58,8 +58,10 @@ sudo apt install libprotobuf-dev protobuf-compiler libprotobuf-lite9v5 protobuf9
 
 ### Installation of openpose 
 please refer to openpose github 
+
 first you have to compile the internal caffe in openpose
 and then `make distribute`
+
 second, you have to compile the openpose 
 and then `make distribute`
 
