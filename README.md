@@ -5,8 +5,9 @@ Python bindings for the awesome Openpose library.
 Openpose github page:
 https://github.com/CMU-Perceptual-Computing-Lab/openpose
 
-notice!! PyOpenPose use OpenCV 3.2 and protobuf 2.6.1
+notice!! PyOpenPose uses OpenCV 3.2 and protobuf 2.6.1
 
+If you use other operating systems, you have to make sure the versions of opencv and protobuf are correct.
 
 ### Install OpenCV 3.2 in ubuntu 16.04 or 14.04
 you can install dependencies of OpenCV using the following command.
@@ -93,6 +94,7 @@ cd scripts
 python OpLoop.py
 ```
 Add the folder containing PyOpenPose.so to your PYTHONPATH, you can use PyOpenPose in you project now.
+
 ### Usage 
 Check the scripts folder for python examples using PyOpenPose.
 
