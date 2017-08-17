@@ -9,7 +9,7 @@ notice!! PyOpenPose use OpenCV 3.2 and protobuf 2.6.1
 
 
 ### Install OpenCV 3.2 in ubuntu 16.04 or 14.04
-you can install dependencies of Opencv using the follow command.
+you can install dependencies of OpenCV using the following command.
 ```
 sudo apt-get install -y build-essential cmake pkg-config
 sudo apt-get install -y libjpeg8-dev libtiff5-dev libjasper-dev libpng12-dev
@@ -28,7 +28,7 @@ unzip opencv.zip
 unzop opencv_contrib.zip
 ```
 
-compile opencv without dnn(if you compile opencv with dnn, there will be an error.)
+compile OpenCV without dnn(or error will occur).
 ```
 cd opencv/
 mkdir build
@@ -96,7 +96,7 @@ Add the folder containing PyOpenPose.so to your PYTHONPATH, you can use PyOpenPo
 ### Usage 
 Check the scripts folder for python examples using PyOpenPose.
 
-### Known Issues
+### Known issues
 *OpenCV 3.3 or 2.4 can not work with PyOpenPose
 
 *Protobuf 3.3 cannot work with PyOpenPose
