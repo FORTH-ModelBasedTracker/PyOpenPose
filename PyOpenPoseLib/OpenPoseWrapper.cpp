@@ -60,8 +60,9 @@ struct OpenPoseWrapper::PrivateData
     op::OpOutputToCvMat opOutputToCvMat;
 };
 
-OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &netFaceSize, const cv::Size &outSize, const std::string &model, const std::string &modelFolder, const int logLevel,
-                                 bool downloadHeatmaps, OpenPoseWrapper::ScaleMode scaleMode) {
+OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &netFaceSize, const cv::Size &outSize,
+                                 const std::string &model, const std::string &modelFolder, const int logLevel,
+                                 bool downloadHeatmaps, OpenPoseWrapper::ScaleMode scaleMode, bool withFace, bool withHands):withFace(withFace), withHands(withHands) {
     google::InitGoogleLogging("OpenPose Wrapper");
 
     // Step 1 - Set logging level
@@ -114,12 +115,14 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
     membersPtr->poseExtractorCaffe.initializationOnThread();
     membersPtr->poseRenderer.initializationOnThread();
-
-    membersPtr->faceExtractor.initializationOnThread();
-    membersPtr->faceRenderer.initializationOnThread();
-
-    membersPtr->handExtractor.initializationOnThread();
-    membersPtr->handRenderer.initializationOnThread();
+    if(withFace) {
+        membersPtr->faceExtractor.initializationOnThread();
+        membersPtr->faceRenderer.initializationOnThread();
+    }
+    if(withHands) {
+        membersPtr->handExtractor.initializationOnThread();
+        membersPtr->handRenderer.initializationOnThread();
+    }
 }
 
 void OpenPoseWrapper::detectPose(const cv::Mat &rgb) {
@@ -132,12 +135,21 @@ void OpenPoseWrapper::detectPose(const cv::Mat &rgb) {
 }
 
 void OpenPoseWrapper::detectFace(const cv::Mat &rgb) {
+    if(!withFace)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Face network was not initialized."));
+    }
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
     const auto faceRects = membersPtr->faceDetector.detectFaces(poseKeypoints, 1.0f);
     membersPtr->faceExtractor.forwardPass(faceRects, rgb, 1.0f);
 }
 
 void OpenPoseWrapper::detectHands(const cv::Mat &rgb) {
+    if(!withHands)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Hand network was not initialized."));
+    }
+
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
     const auto handRects = membersPtr->handDetector.detectHands(poseKeypoints, 1.0f);
     membersPtr->handExtractor.forwardPass(handRects, rgb, 1.0f);
@@ -151,15 +163,17 @@ cv::Mat OpenPoseWrapper::render(const cv::Mat &rgb)
     std::tie(scaleInputToOutput, outputArray) = membersPtr->cvMatToOpOutput.format(rgb);
 
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
-    const auto faceKeypoints = membersPtr->faceExtractor.getFaceKeypoints();
-    const auto handKeypoints = membersPtr->handExtractor.getHandKeypoints();
-
-    // Step 4 - Render poseKeypoints
     membersPtr->poseRenderer.renderPose(outputArray, poseKeypoints);
-    membersPtr->faceRenderer.renderFace(outputArray, faceKeypoints);
-    membersPtr->handRenderer.renderHand(outputArray, handKeypoints);
 
-    // Step 5 - OpenPose output format to cv::Mat
+    if(withFace){
+        const auto faceKeypoints = membersPtr->faceExtractor.getFaceKeypoints();
+        membersPtr->faceRenderer.renderFace(outputArray, faceKeypoints);
+    }
+    if(withHands) {
+        const auto handKeypoints = membersPtr->handExtractor.getHandKeypoints();
+        membersPtr->handRenderer.renderHand(outputArray, handKeypoints);
+    }
+
     auto outputImage = membersPtr->opOutputToCvMat.formatToCvMat(outputArray);
     return outputImage;
 }

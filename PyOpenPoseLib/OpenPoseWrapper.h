@@ -42,11 +42,15 @@ public:
      * @param logLevel Openpose loglevel parameter
      * @param downloadHeatmaps If False the heatmaps wont be downloaded from GPU mem.
      * @param heatMapScaleMode The scale mode of the output heatmaps @see ScaleMode
+     * @param withFace Initialize the network for face pose detection
+     * @param withHands Initialize the network for hand pose detection
      */
     OpenPoseWrapper(const cv::Size &netPoseSize = cv::Size(320, 240), const cv::Size &netFaceHandsSize = cv::Size(128,128),
                     const cv::Size &outputSize = cv::Size(640,480),
                     const std::string &model="COCO", const std::string &modelFolder="models/", const int logLevel=255,
-                    bool downloadHeatmaps=false, OpenPoseWrapper::ScaleMode heatMapScaleMode = OpenPoseWrapper::ScaleMode::ZeroToOne);
+                    bool downloadHeatmaps=false,
+                    OpenPoseWrapper::ScaleMode heatMapScaleMode = OpenPoseWrapper::ScaleMode::ZeroToOne,
+                    bool withFace=true, bool withHands=true);
 
     /**
      * Detect body poses in given image
@@ -99,6 +103,7 @@ public:
 private:
     struct PrivateData;
     std::shared_ptr<PrivateData> membersPtr;
+    bool withFace, withHands;
 
 };
 

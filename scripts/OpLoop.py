@@ -25,17 +25,19 @@ def run():
 
     cap = cv2.VideoCapture(0)
 
-    # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, False)
-    op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, True)
+    download_heatmaps = False
+    # with_face = with_hands = False
+    # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
+    #                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
+    op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
 
-    actualFPS = 0
+    actual_fps = 0
     paused = False
     delay = {True: 0, False: 1}
 
-    frame = 0
     print "Entering main Loop."
     while True:
-        loopStart = time.time() * 1000
+        start_time = time.time()
         try:
             ret, frame = cap.read()
             rgb = frame
@@ -49,21 +51,20 @@ def run():
         op.detectFace(rgb)
         op.detectHands(rgb)
         t = time.time() - t
-        fps = 1.0 / t
+        op_fps = 1.0 / t
 
         res = op.render(rgb)
-
-        cv2.putText(res, 'UI FPS = %f, OP FPS = %f' % (actualFPS, fps), (20, 20), 0, 0.5, (0, 0, 255))
-
+        cv2.putText(res, 'UI FPS = %f, OP FPS = %f' % (actual_fps, op_fps), (20, 20), 0, 0.5, (0, 0, 255))
         persons = op.getKeypoints(op.KeypointType.POSE)[0]
-        hm = op.getHeatmaps()
-        parts = hm[:18]
-        background = hm[18]
-        PAFs = hm[19:] # each PAF has two channels (total 16 PAFs)
-        cv2.imshow("Right Wrist", parts[4])
-        cv2.imshow("background", background)
 
-        showPAFs(PAFs)
+        if download_heatmaps:
+            hm = op.getHeatmaps()
+            parts = hm[:18]
+            background = hm[18]
+            PAFs = hm[19:]  # each PAF has two channels (total 16 PAFs)
+            cv2.imshow("Right Wrist", parts[4])
+            cv2.imshow("background", background)
+            showPAFs(PAFs)
 
         if persons is not None and len(persons) > 0:
             print "First Person: ", persons[0].shape
@@ -77,9 +78,7 @@ def run():
         if key & 255 == ord('q'):
             break
 
-        frame += 1
-        loopEnd = time.time() * 1000
-        actualFPS = (1000.0 / (loopEnd - loopStart))
+        actual_fps = 1.0 / (time.time() - start_time)
 
 if __name__ == '__main__':
     run()
