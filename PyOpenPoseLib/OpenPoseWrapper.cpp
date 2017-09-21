@@ -39,7 +39,7 @@ struct OpenPoseWrapper::PrivateData
 
             handDetector(poseModel),
             handRenderer{outputSize, 0.2},
-            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0}
+            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, 1, 0.4f, heatMapScale}
 
     {}
 
@@ -208,3 +208,8 @@ cv::Mat OpenPoseWrapper::getHeatmaps() {
     return maps.getConstCvMat().clone();
 }
 
+
+cv::Mat OpenPoseWrapper::getHandHeatmaps() {
+    op::Array<float> maps = membersPtr->handExtractor.getHeatMaps();
+    return maps.getConstCvMat().clone();
+}

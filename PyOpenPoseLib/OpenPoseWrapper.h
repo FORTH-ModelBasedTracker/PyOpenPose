@@ -100,6 +100,8 @@ public:
     cv::Mat getHeatmaps();
 
 
+    cv::Mat getHandHeatmaps();
+
 private:
     struct PrivateData;
     std::shared_ptr<PrivateData> membersPtr;

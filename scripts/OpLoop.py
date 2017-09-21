@@ -11,6 +11,11 @@ import os
 OPENPOSE_ROOT = os.environ["OPENPOSE_ROOT"]
 
 
+def showHeatmaps(hm):
+    for idx, h in enumerate(hm):
+        cv2.imshow("HeatMap "+str(idx), h)
+
+
 def showPAFs(PAFs, startIdx=0, endIdx=16):
 
     for idx in range(startIdx, endIdx):
@@ -24,8 +29,7 @@ def showPAFs(PAFs, startIdx=0, endIdx=16):
 def run():
 
     cap = cv2.VideoCapture(0)
-
-    download_heatmaps = False
+    download_heatmaps = True
     # with_face = with_hands = False
     # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
     #                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
@@ -40,7 +44,7 @@ def run():
         start_time = time.time()
         try:
             ret, frame = cap.read()
-            rgb = frame
+            rgb = frame[:, :672]
 
         except Exception as e:
             print "Failed to grab", e
@@ -58,13 +62,17 @@ def run():
         persons = op.getKeypoints(op.KeypointType.POSE)[0]
 
         if download_heatmaps:
-            hm = op.getHeatmaps()
-            parts = hm[:18]
-            background = hm[18]
-            PAFs = hm[19:]  # each PAF has two channels (total 16 PAFs)
-            cv2.imshow("Right Wrist", parts[4])
-            cv2.imshow("background", background)
-            showPAFs(PAFs)
+            hm = op.getHandHeatmaps()
+            print "HM ",hm.shape, hm.dtype
+            showHeatmaps(hm)
+
+            # hm = op.getHeatmaps()
+            # parts = hm[:18]
+            # background = hm[18]
+            # PAFs = hm[19:]  # each PAF has two channels (total 16 PAFs)
+            # cv2.imshow("Right Wrist", parts[4])
+            # cv2.imshow("background", background)
+            # showPAFs(PAFs)
 
         if persons is not None and len(persons) > 0:
             print "First Person: ", persons[0].shape

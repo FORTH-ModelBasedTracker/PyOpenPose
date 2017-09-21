@@ -44,6 +44,7 @@ BOOST_PYTHON_MODULE(OPENPOSE_MODULE_NAME)
                 .def("render", &OpenPoseWrapper::render)
                 .def("getKeypoints", &OpenPoseWrapper::getKeypoints)
                 .def("getHeatmaps", &OpenPoseWrapper::getHeatmaps)
+                .def("getHandHeatmaps", &OpenPoseWrapper::getHandHeatmaps)
             ;
 
     s.attr("KeypointType") = bpy::enum_<OpenPoseWrapper::KeypointType>("KeypointType")
