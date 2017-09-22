@@ -33,13 +33,13 @@ struct OpenPoseWrapper::PrivateData
             poseExtractorCaffe{netInputSize, netOutputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
             poseRenderer{netOutputSize, outputSize, poseModel, nullptr, 0.05, blendAlpha},
 
-            faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0},
+            faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, (heatMapTypes.size()!=0), heatMapScale},
             faceRenderer{outputSize, 0.4},
             faceDetector(poseModel),
 
             handDetector(poseModel),
             handRenderer{outputSize, 0.2},
-            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, 1, 0.4f, heatMapScale}
+            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, 1, 0.4f, (heatMapTypes.size()!=0), heatMapScale}
 
     {}
 
@@ -209,7 +209,12 @@ cv::Mat OpenPoseWrapper::getHeatmaps() {
 }
 
 
-cv::Mat OpenPoseWrapper::getHandHeatmaps() {
-    op::Array<float> maps = membersPtr->handExtractor.getHeatMaps();
+cv::Mat OpenPoseWrapper::getHandHeatmaps(unsigned int personIndex, unsigned int handIndex) {
+    op::Array<float> maps = membersPtr->handExtractor.getHeatMaps(personIndex, handIndex);
+    return maps.getConstCvMat().clone();
+}
+
+cv::Mat OpenPoseWrapper::getFaceHeatmaps(unsigned int personIndex) {
+    op::Array<float> maps = membersPtr->faceExtractor.getHeatMaps(personIndex);
     return maps.getConstCvMat().clone();
 }

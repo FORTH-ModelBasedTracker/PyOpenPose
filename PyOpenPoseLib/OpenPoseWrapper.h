@@ -100,7 +100,8 @@ public:
     cv::Mat getHeatmaps();
 
 
-    cv::Mat getHandHeatmaps();
+    cv::Mat getHandHeatmaps(unsigned int personIndex, unsigned int handIndex);
+    cv::Mat getFaceHeatmaps(unsigned int personIndex);
 
 private:
     struct PrivateData;
