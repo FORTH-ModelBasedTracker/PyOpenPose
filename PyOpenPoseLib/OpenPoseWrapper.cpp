@@ -140,8 +140,33 @@ void OpenPoseWrapper::detectFace(const cv::Mat &rgb) {
         BOOST_THROW_EXCEPTION(std::runtime_error("Face network was not initialized."));
     }
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
-    const auto faceRects = membersPtr->faceDetector.detectFaces(poseKeypoints, 1.0f);
-    membersPtr->faceExtractor.forwardPass(faceRects, rgb, 1.0f);
+    const auto faceRectsOP = membersPtr->faceDetector.detectFaces(poseKeypoints, 1.0f);
+
+    this->faceRects = cv::Mat(faceRectsOP.size(), 4, CV_32SC1, cv::Scalar(0));
+    cv::Mat fr = this->faceRects.reshape(4,faceRects.rows); // stupid cv::Mat iterator cannot iterate over rows.
+    std::transform(faceRectsOP.begin(), faceRectsOP.end(), fr.begin<cv::Vec4i>(), [](const op::Rectangle<float> &r) -> cv::Vec4i { return cv::Vec4i(r.x, r.y, r.width, r.height);});
+
+    membersPtr->faceExtractor.forwardPass(faceRectsOP, rgb, 1.0f);
+}
+
+void OpenPoseWrapper::detectFace(const cv::Mat &rgb, const cv::Mat &faceRects)
+{
+    if(!withFace)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Face network was not initialized."));
+    }
+    if(faceRects.cols!=4 or faceRects.type()!=CV_32SC1)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Invalid face rectangles format. Expected Nx4 mat with type CV_32SC1"));
+    }
+
+    this->faceRects = faceRects; // keep a copy
+    std::vector<op::Rectangle<float> > faceRectsOP(faceRects.rows);
+    cv::Mat fr = faceRects.reshape(4,faceRects.rows); // stupid cv::Mat iterator cannot iterate over rows.
+    std::transform(fr.begin<cv::Vec4i>(), fr.end<cv::Vec4i>(), faceRectsOP.begin(),
+                   [](const cv::Vec4i &r) -> op::Rectangle<float> { return op::Rectangle<float>(r[0], r[1], r[2], r[3]);});
+
+    membersPtr->faceExtractor.forwardPass(faceRectsOP, rgb, 1.0f);
 }
 
 void OpenPoseWrapper::detectHands(const cv::Mat &rgb) {
@@ -151,10 +176,37 @@ void OpenPoseWrapper::detectHands(const cv::Mat &rgb) {
     }
 
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
-    const auto handRects = membersPtr->handDetector.detectHands(poseKeypoints, 1.0f);
-    membersPtr->handExtractor.forwardPass(handRects, rgb, 1.0f);
+    const auto handRectsOP = membersPtr->handDetector.detectHands(poseKeypoints, 1.0f);
+
+    this->handRects= cv::Mat(handRectsOP.size(), 8, CV_32SC1, cv::Scalar(0));
+    cv::Mat hr = this->handRects.reshape(8,handRects.rows); // stupid cv::Mat iterator cannot iterate over rows.
+    std::transform(handRectsOP.begin(), handRectsOP.end(), hr.begin<cv::Vec8i>(),
+                   [](const std::array<op::Rectangle<float>, 2> &r) -> cv::Vec8i
+                   { return cv::Vec8i(r[0].x, r[0].y, r[0].width, r[0].height, r[1].x, r[1].y, r[1].width, r[1].height); });
+
+    membersPtr->handExtractor.forwardPass(handRectsOP, rgb, 1.0f);
 }
 
+void OpenPoseWrapper::detectHands(const cv::Mat &rgb, const cv::Mat &handRects)
+{
+    if(!withHands)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Hand network was not initialized."));
+    }
+    if(handRects.cols!=8 or handRects.type()!=CV_32SC1)
+    {
+        BOOST_THROW_EXCEPTION(std::runtime_error("Invalid hand rectangles format. Expected Nx8 mat with type CV_32SC1"));
+    }
+
+    this->handRects = handRects;
+    std::vector<std::array<op::Rectangle<float>, 2> > handRectsOP(handRects.rows);
+    cv::Mat hr = handRects.reshape(8,handRects.rows); // stupid cv::Mat iterator cannot iterate over rows.
+    std::transform(hr.begin<cv::Vec8i>(), hr.end<cv::Vec8i>(), handRectsOP.begin(),
+                   [](const cv::Vec8i &r) -> std::array<op::Rectangle<float>, 2>
+                   { return std::array<op::Rectangle<float>, 2>{op::Rectangle<float>(r[0], r[1], r[2], r[3]), op::Rectangle<float>(r[4], r[5], r[6], r[7])};});
+
+    membersPtr->handExtractor.forwardPass(handRectsOP, rgb, 1.0f);
+}
 
 cv::Mat OpenPoseWrapper::render(const cv::Mat &rgb)
 {

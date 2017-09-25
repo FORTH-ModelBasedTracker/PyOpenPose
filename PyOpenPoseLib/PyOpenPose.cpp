@@ -19,14 +19,17 @@
 namespace bpy = boost::python;
 
 
-
-
 BOOST_PYTHON_MODULE(OPENPOSE_MODULE_NAME)
 {
     bpy::return_value_policy<bpy::reference_existing_object> ref_existing;
 
     // expose opencv cv::Mat and cv::Size
     expose_opencv();
+
+    void (OpenPoseWrapper::*detectFace1)(const cv::Mat &rgb) = &OpenPoseWrapper::detectFace;
+    void (OpenPoseWrapper::*detectFace2)(const cv::Mat &rgb, const cv::Mat &faceRects) = &OpenPoseWrapper::detectFace;
+    void (OpenPoseWrapper::*detectHands1)(const cv::Mat &rgb) = &OpenPoseWrapper::detectHands;
+    void (OpenPoseWrapper::*detectHands2)(const cv::Mat &rgb, const cv::Mat &handRects) = &OpenPoseWrapper::detectHands;
 
     // OpenPose wrapper
     bpy::scope s =
@@ -39,11 +42,15 @@ BOOST_PYTHON_MODULE(OPENPOSE_MODULE_NAME)
                 .def(bpy::init<cv::Size,cv::Size,cv::Size,std::string, std::string, int, bool, OpenPoseWrapper::ScaleMode, bool>())
                 .def(bpy::init<cv::Size,cv::Size,cv::Size,std::string, std::string, int, bool, OpenPoseWrapper::ScaleMode, bool, bool>())
                 .def("detectPose", &OpenPoseWrapper::detectPose)
-                .def("detectFace", &OpenPoseWrapper::detectFace)
-                .def("detectHands", &OpenPoseWrapper::detectHands)
+                .def("detectFace", detectFace1)
+                .def("detectFace", detectFace2)
+                .def("detectHands", detectHands1)
+                .def("detectHands", detectHands2)
                 .def("render", &OpenPoseWrapper::render)
                 .def("getKeypoints", &OpenPoseWrapper::getKeypoints)
                 .def("getHeatmaps", &OpenPoseWrapper::getHeatmaps)
+                .add_property("handRects", &OpenPoseWrapper::getHandRects)
+                .add_property("faceRects", &OpenPoseWrapper::getFaceRects)
             ;
 
     s.attr("KeypointType") = bpy::enum_<OpenPoseWrapper::KeypointType>("KeypointType")

@@ -12,7 +12,6 @@
 #include <opencv2/opencv.hpp>
 
 
-
 class OpenPoseWrapper {
 
 
@@ -67,12 +66,37 @@ public:
     void detectFace(const cv::Mat &rgb);
 
     /**
+     * Detect faces in given image.
+     * The network is only run in the supplied rectangles
+     * You don't have to call the @refitem detectPose first.
+     *
+     * @param rgb input image
+     * @param faceRects bounding boxes with the hand positions in the image. Nx4 cv::Mat with type CV_32SC1.
+     *        One row per person, Each row is a bounding box [x,y,width,height] .
+     */
+    void detectFace(const cv::Mat &rgb, const cv::Mat &faceRects);
+
+    /**
+     * Detect hands in given image.
+     * The network is only run in the supplied rectangles
+     * You don't have to call the @refitem detectPose first.
+     *
+     * @param rgb input image
+     * @param handRects bounding boxes with the hand positions in the image. Nx8 cv::Mat with type CV_32SC1.
+     *        Each row corresponds to  a person. Each row represents two bounding rectangles of the form:
+     *         [ leftX, leftY, leftWidth, leftHeight, rightX, rightY, rightWidth, rightHeight]
+     */
+    void detectHands(const cv::Mat &rgb, const cv::Mat &handRects);
+
+
+    /**
      * Detect hands in given image.
      * You need to call the @refitem detectPose with the same image first.
      *
      * @param rgb input image
      */
     void detectHands(const cv::Mat &rgb);
+
 
     /**
      * Uses the visualization tools of Openpose to render detected keypoints on the input rgb image
@@ -99,11 +123,54 @@ public:
      */
     cv::Mat getHeatmaps();
 
+    /**
+     * Returns the hand rectangles (bouding boxes) used during the the
+     * last network forward pass (i.e last call to detectHands)
+     *
+     * The rectangles are stored in a cv::Mat with N rows by 8 columns.
+     * Each row corresponds to  a person.
+     * Each row represents two bounding rectangles of the form:
+     *  [ leftX, leftY, leftWidth, leftHeight, rightX, rightY, rightWidth, rightHeight]
+     * if width or height is zero, the corresponding rectangle is ignored.
+     * Check the openpose source (handExtractor::forwardPass for more details)
+     *
+     * @return a cv::Mat Nx8. Each row holds two rectangles, one for the left and one for the right hand.
+     */
+    const cv::Mat getHandRects() const {
+        return handRects;
+    }
+
+    /**
+     * Returns the face rectangles (bouding boxes) used during the the
+     * last network forward pass (i.e last call to detectFace)
+     * The rectangles are stored in a cv::Mat with N rows and 4 columns.
+     * Each row represents a bounding rectangle of the form:
+     *  [ faceX, faceY, faceWidth, faceHeight]
+     * Faces with area less than 40 (faceWidth*faceHeight<40) are ignored.
+     * Check the openpose source (faceExtractor::forwardPass for more details)
+     * @return a vector of rectangles, one for each face.
+     */
+    const cv::Mat getFaceRects() const {
+        return faceRects;
+    }
+
 
 private:
     struct PrivateData;
     std::shared_ptr<PrivateData> membersPtr;
+
     bool withFace, withHands;
+
+    // N rows by 8 columns. Each row corresponds to  a person.
+    // Each row represents two bounding rectangles of the form:
+    // [ leftX, leftY, leftWidth, leftHeight, rightX, rightY, rightWidth, rightHeight]
+    // if width or height is zero, the corresponding rectangle is ignored.
+    cv::Mat handRects;
+
+    // N rows by 4 columns. Each row corresponds to  a person.
+    // Each row represents a bounding rectangle of the form:
+    // [ faceX, faceY, faceWidth, faceHeight]
+    cv::Mat faceRects;
 
 };
 
