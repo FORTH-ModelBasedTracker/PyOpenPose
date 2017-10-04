@@ -12,20 +12,22 @@ OPENPOSE_ROOT = os.environ["OPENPOSE_ROOT"]
 
 
 def showPAFs(PAFs, startIdx=0, endIdx=16):
-
+    allpafs = []
     for idx in range(startIdx, endIdx):
         X = PAFs[idx*2]
         Y = PAFs[idx*2+1]
         tmp = np.dstack((X, Y, np.zeros_like(X)))
+        allpafs.append(tmp)
 
-        cv2.imshow("PAF "+str(idx), tmp)
+    pafs = np.mean(allpafs, axis=0)
+    cv2.imshow("PAF", pafs)
 
 
 def run():
 
     cap = cv2.VideoCapture(0)
 
-    download_heatmaps = False
+    download_heatmaps = True
     # with_face = with_hands = False
     # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
     #                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)

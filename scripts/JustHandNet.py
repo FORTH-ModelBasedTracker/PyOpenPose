@@ -82,8 +82,8 @@ def run():
         leftHand = op.getKeypoints(op.KeypointType.HAND)[0].reshape(-1, 3)
         score, newHandBB = ComputeBB(leftHand)
         print "Res Score, HandBB: ", score, newHandBB
-        if score > 0.5: # update BB only when score is good.
-            handBB = newHandBB
+        # if score > 0.5: # update BB only when score is good.
+        #     handBB = newHandBB
 
         key = cv2.waitKey(delay[paused])
         if key & 255 == ord('p'):
