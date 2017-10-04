@@ -28,17 +28,16 @@ struct OpenPoseWrapper::PrivateData
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
                 const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale):
             cvMatToOpInput{netInputSize, numScales, scaleGap}, cvMatToOpOutput{outputSize},
-            opOutputToCvMat{outputSize},
 
             poseExtractorCaffe{netInputSize, netOutputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
-            poseRenderer{netOutputSize, outputSize, poseModel, nullptr, 0.05, blendAlpha},
+            poseRenderer{netOutputSize, poseModel, nullptr, 0.05, true, blendAlpha},
 
             faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0},
-            faceRenderer{outputSize, 0.4},
+            faceRenderer{0.4},
             faceDetector(poseModel),
 
             handDetector(poseModel),
-            handRenderer{outputSize, 0.2},
+            handRenderer{0.2},
             handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0}
 
     {}
@@ -47,15 +46,15 @@ struct OpenPoseWrapper::PrivateData
     op::CvMatToOpOutput cvMatToOpOutput;
     op::PoseExtractorCaffe poseExtractorCaffe;
 
-    op::PoseRenderer poseRenderer;
+    op::PoseGpuRenderer poseRenderer;
 
     op::FaceExtractor faceExtractor;
     op::FaceDetector faceDetector;
-    op::FaceRenderer faceRenderer;
+    op::FaceGpuRenderer faceRenderer;
 
     op::HandExtractor handExtractor;
     op::HandDetector handDetector;
-    op::HandRenderer handRenderer;
+    op::HandGpuRenderer handRenderer;
 
     op::OpOutputToCvMat opOutputToCvMat;
 };
