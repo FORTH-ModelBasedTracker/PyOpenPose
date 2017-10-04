@@ -155,6 +155,20 @@ public:
     }
 
 
+    /**
+     * Returns a vector of length 2.
+     * Index 0 holds all left hands detected.
+     * Index 1 holds all right hands detected.
+     * @return all the hands (left and right) of all persons detected during the last call.
+     */
+    std::vector<cv::Mat> getHandHeatmaps();
+
+    /**
+     * Get all face heatmaps for all persons detected.
+     * @return a cv::Mat with all heatmaps for all persons.
+     */
+    cv::Mat getFaceHeatmaps();
+
 private:
     struct PrivateData;
     std::shared_ptr<PrivateData> membersPtr;

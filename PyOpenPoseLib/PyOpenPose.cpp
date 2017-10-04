@@ -49,6 +49,8 @@ BOOST_PYTHON_MODULE(OPENPOSE_MODULE_NAME)
                 .def("render", &OpenPoseWrapper::render)
                 .def("getKeypoints", &OpenPoseWrapper::getKeypoints)
                 .def("getHeatmaps", &OpenPoseWrapper::getHeatmaps)
+                .def("getHandHeatmaps", &OpenPoseWrapper::getHandHeatmaps)
+                .def("getFaceHeatmaps", &OpenPoseWrapper::getFaceHeatmaps)
                 .add_property("handRects", &OpenPoseWrapper::getHandRects)
                 .add_property("faceRects", &OpenPoseWrapper::getFaceRects)
             ;

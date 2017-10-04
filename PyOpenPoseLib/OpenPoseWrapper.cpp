@@ -32,13 +32,13 @@ struct OpenPoseWrapper::PrivateData
             poseExtractorCaffe{netInputSize, netOutputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
             poseRenderer{netOutputSize, poseModel, nullptr, 0.05, true, blendAlpha},
 
-            faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0},
+            faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, heatMapTypes, heatMapScale},
             faceRenderer{0.4},
             faceDetector(poseModel),
 
             handDetector(poseModel),
             handRenderer{0.2},
-            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0}
+            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, 1, 0.4, heatMapTypes, heatMapScale}
 
     {}
 
@@ -259,3 +259,18 @@ cv::Mat OpenPoseWrapper::getHeatmaps() {
     return maps.getConstCvMat().clone();
 }
 
+
+std::vector<cv::Mat> OpenPoseWrapper::getHandHeatmaps() {
+
+    std::array<op::Array<float>, 2> maps = membersPtr->handExtractor.getHeatMaps();
+
+    std::vector<cv::Mat> res;
+    res.push_back(maps.at(0).getConstCvMat().clone());
+    res.push_back(maps.at(1).getConstCvMat().clone());
+    return res;
+}
+
+cv::Mat OpenPoseWrapper::getFaceHeatmaps() {
+    op::Array<float> maps = membersPtr->faceExtractor.getHeatMaps();
+    return maps.getConstCvMat().clone();
+}
