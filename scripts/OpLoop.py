@@ -1,6 +1,8 @@
 """
 Example script using PyOpenPose.
 """
+import PyMBVCore
+import PyMBVAcquisition as acq
 import PyOpenPose as OP
 import time
 import cv2
@@ -30,13 +32,14 @@ def showPAFs(PAFs, startIdx=0, endIdx=16):
 
 def run():
 
-    cap = cv2.VideoCapture(0)
-
+    cap = acq.OpenNIGrabber(True, True, '/home/mad/Development/Projects/BlenderMBV/Scripts/data/media/openni.xml', "")
+    cap.initialize()
     download_heatmaps = True
-    # with_face = with_hands = False
-    # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
-    #                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
-    op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
+    with_face = with_hands = False
+    op = OP.OpenPose((320, 240), (368, 368), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
+                     download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
+    # op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
+
 
     actual_fps = 0
     paused = False
@@ -46,8 +49,10 @@ def run():
     while True:
         start_time = time.time()
         try:
-            ret, frame = cap.read()
-            rgb = frame[:, :672]
+
+            frames, calibs = cap.grab()
+            rgb = frames[1]
+
 
         except Exception as e:
             print "Failed to grab", e
@@ -55,8 +60,8 @@ def run():
 
         t = time.time()
         op.detectPose(rgb)
-        op.detectFace(rgb)
-        op.detectHands(rgb)
+        # op.detectFace(rgb)
+        # op.detectHands(rgb)
         t = time.time() - t
         op_fps = 1.0 / t
 
