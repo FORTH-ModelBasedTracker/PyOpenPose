@@ -15,6 +15,8 @@
 
 #include <openpose/utilities/headers.hpp>
 
+#include <boost/throw_exception.hpp>
+
 // Detector specific paramters are here:
 //#include <openpose/hand/handParameters.hpp>
 //#include <openpose/face/faceParameters.hpp>
@@ -27,10 +29,8 @@ struct OpenPoseWrapper::PrivateData
                 const op::Point<int> &outputSize, const op::PoseModel &poseModel,
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
                 const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale):
-            cvMatToOpInput{netInputSize, numScales, scaleGap}, cvMatToOpOutput{outputSize},
-
             poseExtractorCaffe{netInputSize, netOutputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
-            poseRenderer{netOutputSize, poseModel, nullptr, 0.05, true, blendAlpha},
+            poseRenderer{poseModel, nullptr, 0.05, true, blendAlpha},
 
             faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, heatMapTypes, heatMapScale},
             faceRenderer{0.4},
@@ -48,11 +48,11 @@ struct OpenPoseWrapper::PrivateData
 
     op::PoseGpuRenderer poseRenderer;
 
-    op::FaceExtractor faceExtractor;
+    op::FaceExtractorCaffe faceExtractor;
     op::FaceDetector faceDetector;
     op::FaceGpuRenderer faceRenderer;
 
-    op::HandExtractor handExtractor;
+    op::HandExtractorCaffe handExtractor;
     op::HandDetector handDetector;
     op::HandGpuRenderer handRenderer;
 
