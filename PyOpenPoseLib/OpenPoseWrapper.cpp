@@ -7,6 +7,7 @@
 #include <glog/logging.h>
 
 #include <openpose/core/headers.hpp>
+#include <openpose/core/scaleAndSizeExtractor.hpp>
 #include <openpose/gui/headers.hpp>
 
 #include <openpose/pose/headers.hpp>
@@ -24,21 +25,21 @@
 
 struct OpenPoseWrapper::PrivateData
 {
-    PrivateData(const op::Point<int> &netInputSize, const op::Point<int> &netOutputSize,
-                const op::Point<int> &netInputSizeFace, const op::Point<int> &netOutputSizeFace,
+    PrivateData(const op::Point<int> &netInputSize, const op::Point<int> &netInputSizeFaceAndHands,
                 const op::Point<int> &outputSize, const op::PoseModel &poseModel,
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
                 const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale):
-            poseExtractorCaffe{netInputSize, netOutputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
+            poseExtractorCaffe{netInputSize, netInputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
             poseRenderer{poseModel, nullptr, 0.05, true, blendAlpha},
+            scaleAndSizeExtractor{netInputSize, outputSize, numScales, scaleGap},
 
-            faceExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, heatMapTypes, heatMapScale},
+            faceExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, 0, heatMapTypes, heatMapScale},
             faceRenderer{0.4},
             faceDetector(poseModel),
 
             handDetector(poseModel),
             handRenderer{0.2},
-            handExtractor{netInputSizeFace, netOutputSizeFace, modelFolder, 0, 1, 0.4, heatMapTypes, heatMapScale}
+            handExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, 0, 1, 0.4, heatMapTypes, heatMapScale}
 
     {}
 
@@ -57,12 +58,13 @@ struct OpenPoseWrapper::PrivateData
     op::HandGpuRenderer handRenderer;
 
     op::OpOutputToCvMat opOutputToCvMat;
+    op::ScaleAndSizeExtractor scaleAndSizeExtractor;
 };
 
-OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &netFaceSize, const cv::Size &outSize,
+OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &netFaceHandsSize, const cv::Size &outSize,
                                  const std::string &model, const std::string &modelFolder, const int logLevel,
                                  bool downloadHeatmaps, OpenPoseWrapper::ScaleMode scaleMode, bool withFace, bool withHands):withFace(withFace), withHands(withHands) {
-    google::InitGoogleLogging("OpenPose Wrapper");
+//    google::InitGoogleLogging("OpenPose Wrapper");
 
     // Step 1 - Set logging level
     // - 0 will output all the logging messages
@@ -74,9 +76,7 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
     // Step 2 - Init params
     op::Point<int> outputSize(outSize.width,outSize.height);
     op::Point<int> netInputSize(netPoseSize.width,netPoseSize.height);
-    op::Point<int> netOutputSize = netInputSize;
-    op::Point<int> netInputSizeFace(netFaceSize.width,netFaceSize.height);
-    op::Point<int> netOutputSizeFace = netInputSizeFace;
+    op::Point<int> netInputSizeFaceAndHands(netFaceHandsSize.width,netFaceHandsSize.height);
 
     op::PoseModel poseModel;
 
@@ -105,8 +105,7 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
     }
 
     // Step 3 - Initialize all required classes
-    membersPtr = std::shared_ptr<PrivateData>(new PrivateData(netInputSize, netOutputSize,
-                                                              netInputSizeFace, netOutputSizeFace,
+    membersPtr = std::shared_ptr<PrivateData>(new PrivateData(netInputSize, netInputSizeFaceAndHands,
                                                               outputSize, poseModel, modelFolder,
                                                               numScales, scaleGap, blendAlpha,
                                                               hmt, (op::ScaleMode)scaleMode));
@@ -126,11 +125,18 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
 
 void OpenPoseWrapper::detectPose(const cv::Mat &rgb) {
     // Step 2 - Format input image to OpenPose input and output formats
-    op::Array<float> netInputArray;
-    std::vector<float> scaleRatios;
-    std::tie(netInputArray, scaleRatios) = membersPtr->cvMatToOpInput.format(rgb);
+
+    const op::Point<int> imageSize{rgb.cols, rgb.rows};
+    std::vector<double> scaleInputToNetInputs;
+    std::vector<op::Point<int>> netInputSizes;
+    double scaleInputToOutput;
+    op::Point<int> outputResolution;
+    std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
+            = membersPtr->scaleAndSizeExtractor.extract(imageSize);
+    op::Array<float> netInputArray = membersPtr->cvMatToOpInput.createArray(rgb, scaleInputToNetInputs, netInputSizes);
+
     // Step 3 - Estimate poseKeypoints
-    membersPtr->poseExtractorCaffe.forwardPass(netInputArray, {rgb.cols, rgb.rows}, scaleRatios);
+    membersPtr->poseExtractorCaffe.forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
 }
 
 void OpenPoseWrapper::detectFace(const cv::Mat &rgb) {
@@ -209,9 +215,17 @@ void OpenPoseWrapper::detectHands(const cv::Mat &rgb, const cv::Mat &handRects)
 
 cv::Mat OpenPoseWrapper::render(const cv::Mat &rgb)
 {
-    double scaleInputToOutput;
     op::Array<float> outputArray;
-    std::tie(scaleInputToOutput, outputArray) = membersPtr->cvMatToOpOutput.format(rgb);
+
+    const op::Point<int> imageSize{rgb.cols, rgb.rows};
+    std::vector<double> scaleInputToNetInputs;
+    std::vector<op::Point<int>> netInputSizes;
+    double scaleInputToOutput;
+    op::Point<int> outputResolution;
+    std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
+            = membersPtr->scaleAndSizeExtractor.extract(imageSize);
+
+    outputArray = membersPtr->cvMatToOpOutput.createArray(rgb, scaleInputToOutput, outputResolution);
 
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
     membersPtr->poseRenderer.renderPose(outputArray, poseKeypoints);

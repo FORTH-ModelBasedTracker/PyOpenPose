@@ -47,7 +47,8 @@ def run():
         start_time = time.time()
         try:
             ret, frame = cap.read()
-            rgb = frame[:, :672]
+            rgb = frame
+            print "RGB", rgb.shape
 
         except Exception as e:
             print "Failed to grab", e
