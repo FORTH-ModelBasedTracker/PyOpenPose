@@ -28,18 +28,18 @@ struct OpenPoseWrapper::PrivateData
     PrivateData(const op::Point<int> &netInputSize, const op::Point<int> &netInputSizeFaceAndHands,
                 const op::Point<int> &outputSize, const op::PoseModel &poseModel,
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
-                const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale):
-            poseExtractorCaffe{poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
+                const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale, int gpuId):
+            poseExtractorCaffe{poseModel, modelFolder, gpuId, heatMapTypes, heatMapScale},
             poseRenderer{poseModel, nullptr, 0.05, true, blendAlpha},
             scaleAndSizeExtractor{netInputSize, outputSize, numScales, scaleGap},
 
-            faceExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, 0, heatMapTypes, heatMapScale},
+            faceExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, gpuId, heatMapTypes, heatMapScale},
             faceRenderer{0.4},
             faceDetector(poseModel),
 
             handDetector(poseModel),
             handRenderer{0.2},
-            handExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, 0, 1, 0.4, heatMapTypes, heatMapScale}
+            handExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, gpuId, 1, 0.4, heatMapTypes, heatMapScale}
 
     {}
 
@@ -63,7 +63,7 @@ struct OpenPoseWrapper::PrivateData
 
 OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &netFaceHandsSize, const cv::Size &outSize,
                                  const std::string &model, const std::string &modelFolder, const int logLevel,
-                                 bool downloadHeatmaps, OpenPoseWrapper::ScaleMode scaleMode, bool withFace, bool withHands):withFace(withFace), withHands(withHands) {
+                                 bool downloadHeatmaps, OpenPoseWrapper::ScaleMode scaleMode, bool withFace, bool withHands, int gpuId):withFace(withFace), withHands(withHands) {
 //    google::InitGoogleLogging("OpenPose Wrapper");
 
     // Step 1 - Set logging level
@@ -108,7 +108,7 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
     membersPtr = std::shared_ptr<PrivateData>(new PrivateData(netInputSize, netInputSizeFaceAndHands,
                                                               outputSize, poseModel, modelFolder,
                                                               numScales, scaleGap, blendAlpha,
-                                                              hmt, (op::ScaleMode)scaleMode));
+                                                              hmt, (op::ScaleMode)scaleMode, gpuId));
 
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
     membersPtr->poseExtractorCaffe.initializationOnThread();

@@ -49,7 +49,7 @@ public:
                     const std::string &model="COCO", const std::string &modelFolder="models/", const int logLevel=255,
                     bool downloadHeatmaps=false,
                     OpenPoseWrapper::ScaleMode heatMapScaleMode = OpenPoseWrapper::ScaleMode::ZeroToOne,
-                    bool withFace=true, bool withHands=true);
+                    bool withFace=true, bool withHands=true, int gpuId=0);
 
     /**
      * Detect body poses in given image
