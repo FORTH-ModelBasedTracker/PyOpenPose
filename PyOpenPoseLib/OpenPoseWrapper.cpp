@@ -29,7 +29,7 @@ struct OpenPoseWrapper::PrivateData
                 const op::Point<int> &outputSize, const op::PoseModel &poseModel,
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
                 const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale):
-            poseExtractorCaffe{netInputSize, netInputSize, outputSize, numScales, poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
+            poseExtractorCaffe{poseModel, modelFolder, 0, heatMapTypes, heatMapScale},
             poseRenderer{poseModel, nullptr, 0.05, true, blendAlpha},
             scaleAndSizeExtractor{netInputSize, outputSize, numScales, scaleGap},
 
@@ -228,7 +228,7 @@ cv::Mat OpenPoseWrapper::render(const cv::Mat &rgb)
     outputArray = membersPtr->cvMatToOpOutput.createArray(rgb, scaleInputToOutput, outputResolution);
 
     const auto poseKeypoints = membersPtr->poseExtractorCaffe.getPoseKeypoints();
-    membersPtr->poseRenderer.renderPose(outputArray, poseKeypoints);
+    membersPtr->poseRenderer.renderPose(outputArray, poseKeypoints, scaleInputToOutput);
 
     if(withFace){
         const auto faceKeypoints = membersPtr->faceExtractor.getFaceKeypoints();
