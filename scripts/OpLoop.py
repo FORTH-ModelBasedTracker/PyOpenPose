@@ -32,7 +32,7 @@ def run():
 
     cap = cv2.VideoCapture(0)
 
-    download_heatmaps = True
+    download_heatmaps = False
     # with_face = with_hands = False
     # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
     #                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
