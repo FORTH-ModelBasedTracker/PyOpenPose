@@ -133,7 +133,7 @@ void OpenPoseWrapper::detectPose(const cv::Mat &rgb) {
     op::Point<int> outputResolution;
     std::tie(scaleInputToNetInputs, netInputSizes, scaleInputToOutput, outputResolution)
             = membersPtr->scaleAndSizeExtractor.extract(imageSize);
-    op::Array<float> netInputArray = membersPtr->cvMatToOpInput.createArray(rgb, scaleInputToNetInputs, netInputSizes);
+    std::vector<op::Array<float>> netInputArray = membersPtr->cvMatToOpInput.createArray(rgb, scaleInputToNetInputs, netInputSizes);
 
     // Step 3 - Estimate poseKeypoints
     membersPtr->poseExtractorCaffe.forwardPass(netInputArray, imageSize, scaleInputToNetInputs);
