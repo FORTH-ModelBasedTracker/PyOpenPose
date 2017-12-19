@@ -12,7 +12,7 @@ Set an environment variable named OPENPOSE_ROOT pointing to the openpose root fo
 
 __Note:__ Openpose lib is under heavy development and the API changes very often. 
 Some API changes will break PyOpenPose. I try to upgrade as soon as possible but I am usually a few days behind. 
-Openning an issue helps to speed-up the proccess. Current PyOpenPose version is built with [openpose commit e086e6f](https://github.com/CMU-Perceptual-Computing-Lab/openpose/commit/e086e6fc6a5f4650d5c3a100b8ced8363fd2d099)
+Openning an issue helps to speed-up the proccess. Current PyOpenPose version is built with [openpose commit 1b0325e](https://github.com/padeler/openpose/commit/1b0325e2980a43ba2c9612068f78eb1c38d41ee5)
 
 __Note:__ PyOpenPose requires __opencv3.x__. You will have to build openpose with opencv3 as well.
 
