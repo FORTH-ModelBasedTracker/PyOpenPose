@@ -42,16 +42,16 @@ def run():
     paused = False
     delay = {True: 0, False: 1}
 
-    print "Entering main Loop."
+    print("Entering main Loop.")
     while True:
         start_time = time.time()
         try:
             ret, frame = cap.read()
             rgb = frame
-            print "RGB", rgb.shape
+            print("RGB", rgb.shape)
 
         except Exception as e:
-            print "Failed to grab", e
+            print("Failed to grab", e)
             break
 
         t = time.time()
@@ -67,7 +67,7 @@ def run():
 
         if download_heatmaps:
             hm = op.getHeatmaps()
-            print "HM ",hm.shape, hm.dtype
+            print("HM ",hm.shape, hm.dtype)
             showHeatmaps(hm)
 
             # hm = op.getHeatmaps()
@@ -79,7 +79,7 @@ def run():
             # showPAFs(PAFs)
 
         if persons is not None and len(persons) > 0:
-            print "First Person: ", persons[0].shape
+            print("First Person: ", persons[0].shape)
 
         cv2.imshow("OpenPose result", res)
 

@@ -39,16 +39,16 @@ def run():
     paused = False
     delay = {True: 0, False: 1}
 
-    print "Entering main Loop."
+    print("Entering main Loop.")
     while True:
         start_time = time.time()
         try:
             ret, frame = cap.read()
             rgb = frame
-            print rgb.shape
+            print(rgb.shape)
 
         except Exception as e:
-            print "Failed to grab", e
+            print("Failed to grab", e)
             break
 
         t = time.time()
@@ -66,9 +66,9 @@ def run():
 
             faces = op.getFaceHeatmaps()
             left_hands, right_hands = op.getHandHeatmaps()
-            print "all face maps: ", faces.shape
-            print "Left hand maps: ", left_hands.shape
-            print "Right hand maps: ", right_hands.shape
+            print("all face maps: ", faces.shape)
+            print("Left hand maps: ", left_hands.shape)
+            print("Right hand maps: ", right_hands.shape)
 
             # if no face or hand is detected for a person then the
             # corresponding heatmaps contain invalid data.
@@ -89,7 +89,7 @@ def run():
             # showPAFs(PAFs)
 
         if persons is not None and len(persons) > 0:
-            print "First Person: ", persons[0].shape
+            print("First Person: ", persons[0].shape)
 
         cv2.imshow("OpenPose result", res)
 

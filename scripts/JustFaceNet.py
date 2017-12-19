@@ -41,7 +41,7 @@ def run():
     imgSize = list(frame.shape)
     outSize = imgSize[1::-1]
 
-    print "Net output size: ", outSize
+    print("Net output size: ", outSize)
 
     download_heatmaps = False
     with_hands = False
@@ -54,7 +54,7 @@ def run():
     delay = {True: 0, False: 1}
     newFaceBB = initFaceBB = faceBB = [240, 120, 150, 150]
 
-    print "Entering main Loop. Put your hand into the box to start tracking"
+    print("Entering main Loop. Put your hand into the box to start tracking")
     while True:
         start_time = time.time()
         try:
@@ -62,7 +62,7 @@ def run():
             rgb = frame[:, :outSize[0]]
 
         except Exception as e:
-            print "Failed to grab", e
+            print("Failed to grab", e)
             break
 
         t = time.time()
@@ -81,7 +81,7 @@ def run():
 
         face = op.getKeypoints(op.KeypointType.FACE)[0].reshape(-1, 3)
         score, newFaceBB = ComputeBB(face)
-        print "Res Score, faceBB: ", score, newFaceBB
+        print("Res Score, faceBB: ", score, newFaceBB)
         if score > 0.5: # update BB only when score is good.
             faceBB = newFaceBB
 
