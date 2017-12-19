@@ -15,7 +15,7 @@ from OpLoop_heatmaps_example import showHeatmaps
 OPENPOSE_ROOT = os.environ["OPENPOSE_ROOT"]
 
 
-def ComputeBB(hand, padding=0.4):
+def ComputeBB(hand, padding=1.5):
     minX = np.min(hand[:, 0])
     minY = np.min(hand[:, 1])
 
@@ -25,14 +25,15 @@ def ComputeBB(hand, padding=0.4):
     width = maxX - minX
     height = maxY - minY
 
-    padX = width * padding / 2
-    padY = height * padding / 2
+    cx = minX + width/2
+    cy = minY + height/2
 
-    minX -= padX
-    minY -= padY
+    width = height = max(width, height)
+    width = height = width * padding
 
-    width += 2 * padX
-    height += 2 * padY
+    minX = cx - width/2
+    minY = cy - height/2
+
 
     score = np.mean(hand[:, 2])
     return score, [int(minX), int(minY), int(width), int(height)]
