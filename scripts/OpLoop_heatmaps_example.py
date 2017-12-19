@@ -14,6 +14,7 @@ OPENPOSE_ROOT = os.environ["OPENPOSE_ROOT"]
 def showHeatmaps(hm, prefix="HeatMap "):
     h = np.sum(hm, axis=0)
     cv2.imshow(prefix, h)
+    return h
 
 
 def showPAFs(PAFs, startIdx=0, endIdx=16):

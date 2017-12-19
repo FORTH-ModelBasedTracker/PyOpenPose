@@ -8,6 +8,9 @@ import cv2
 
 import numpy as np
 import os
+from matplotlib import pyplot as plt
+
+from OpLoop_heatmaps_example import showHeatmaps
 
 OPENPOSE_ROOT = os.environ["OPENPOSE_ROOT"]
 
@@ -43,7 +46,7 @@ def run():
 
     print "Net output size: ", outSize
 
-    download_heatmaps = False
+    download_heatmaps = True
     with_hands = True
     with_face = False
     op = OP.OpenPose((656, 368), (240, 240), tuple(outSize), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
@@ -52,7 +55,7 @@ def run():
     actual_fps = 0
     paused = False
     delay = {True: 0, False: 1}
-    newHandBB = initHandBB = handBB = [270, 190, 150, 150]
+    newHandBB = initHandBB = handBB = [270, 190, 200, 200]
 
     print "Entering main Loop. Put your hand into the box to start tracking"
     while True:
@@ -77,7 +80,22 @@ def run():
         cv2.rectangle(res, (handBB[0], handBB[1]), (handBB[0] + handBB[2], handBB[1] + handBB[3]), [50, 155, 50], 2)
         cv2.rectangle(res, (newHandBB[0], newHandBB[1]), (newHandBB[0] + newHandBB[2], newHandBB[1] + newHandBB[3]),
                       [250, 55, 50], 1)
+
+        if download_heatmaps:
+            left_hands, right_hands = op.getHandHeatmaps()
+            for pidx in range(len(left_hands)):
+                hm = showHeatmaps(left_hands[pidx], "Left Hand"+str(pidx))
+                plt.imshow(hm)
+
+                hm = hm[:, ::-1]
+                x,y,w,h = handBB
+                hs = cv2.resize(hm,(w,h))
+                hs3 = (np.dstack((hs,hs,hs)) * 255).astype(np.ubyte)
+                res[y:y+h, x:x+w] += hs3
+
+
         cv2.imshow("OpenPose result", res)
+
 
         leftHand = op.getKeypoints(op.KeypointType.HAND)[0].reshape(-1, 3)
         score, newHandBB = ComputeBB(leftHand)
@@ -94,6 +112,8 @@ def run():
 
         if key & 255 == ord('r'):
             handBB = initHandBB
+        if key & 255 == ord('u'):
+            plt.show()
 
         actual_fps = 1.0 / (time.time() - start_time)
 
