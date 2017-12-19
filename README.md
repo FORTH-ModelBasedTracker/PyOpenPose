@@ -27,6 +27,11 @@ make
 
 Add the folder containing PyOpenPose.so to your PYTHONPATH.
 
+# Building the library for python3
+
+ - make sure cmake discovers python3 libraries and include dirs. 
+ - `libboost_python.so` must point to `/usr/lib/x86_64-linux-gnu/libboost_python-py35.so`
+ - run the example scripts with python3
 
 ### Testing
 
