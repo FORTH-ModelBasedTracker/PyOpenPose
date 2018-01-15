@@ -269,7 +269,7 @@ OpenPoseWrapper::KeypointGroups OpenPoseWrapper::getKeypoints(KeypointType kpt) 
 }
 
 cv::Mat OpenPoseWrapper::getHeatmaps() {
-    op::Array<float> maps = membersPtr->poseExtractorCaffe.getHeatMaps();
+    op::Array<float> maps = membersPtr->poseExtractorCaffe.getHeatMapsCopy();
     return maps.getConstCvMat().clone();
 }
 

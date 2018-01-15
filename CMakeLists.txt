@@ -48,21 +48,30 @@ endif()
 
 find_package(CUDA REQUIRED)
 find_package(OpenCV 3 REQUIRED)
-find_package(Boost COMPONENTS system python REQUIRED)
-find_package(PythonLibs REQUIRED)
 find_package(Doxygen)
+
+### for python 2 use this:
+find_package(Boost COMPONENTS system python-py27 REQUIRED)
+find_package(PythonLibs 2.7 EXACT REQUIRED) 
+
+### for python 3 use this:
+#find_package(Boost COMPONENTS system python-py35 REQUIRED)
+#find_package(PythonLibs 3 EXACT REQUIRED) 
+
+
+
 
 # USE_CAFFE define needed by openpose headers
 if(DEFINED ENV{OPENPOSE_ROOT})
     add_definitions("-DUSE_CAFFE")
 
     set(OPENPOSE_INCLUDE_DIRS "$ENV{OPENPOSE_ROOT}/include")
-    set(OPENPOSE_LIBRARIES "$ENV{OPENPOSE_ROOT}/build/lib")
-    set(CAFFE_INCLUDE_DIRS "$ENV{OPENPOSE_ROOT}/3rdparty/caffe/distribute/include")
-    set(CAFFE_LIBRARIES "$ENV{OPENPOSE_ROOT}/3rdparty/caffe/distribute/lib")
+    set(OPENPOSE_LIBRARIES "$ENV{OPENPOSE_ROOT}/lib")
+    set(CAFFE_INCLUDE_DIRS "$ENV{OPENPOSE_ROOT}/include")
+    set(CAFFE_LIBRARIES "$ENV{OPENPOSE_ROOT}/lib")
 
 else()
-    message(FATAL_ERROR "Environment variable OPENPOSE_ROOT is not set. Please set and point to openpose root folder")
+    message(FATAL_ERROR "Environment variable OPENPOSE_ROOT is not set. Please set and point to openpose installation folder")
 endif()
 
 
