@@ -51,12 +51,12 @@ find_package(OpenCV 3 REQUIRED)
 find_package(Doxygen)
 
 ### for python 2 use this:
-find_package(Boost COMPONENTS system python-py27 REQUIRED)
-find_package(PythonLibs 2.7 EXACT REQUIRED) 
+#find_package(Boost COMPONENTS system python-py27 REQUIRED)
+#find_package(PythonLibs 2.7 EXACT REQUIRED) 
 
 ### for python 3 use this:
-#find_package(Boost COMPONENTS system python-py35 REQUIRED)
-#find_package(PythonLibs 3 EXACT REQUIRED) 
+find_package(Boost COMPONENTS system python3 REQUIRED)
+find_package(PythonLibs 3 EXACT REQUIRED) 
 
 
 
@@ -69,7 +69,7 @@ if(DEFINED ENV{OPENPOSE_ROOT})
     set(OPENPOSE_LIBRARIES "$ENV{OPENPOSE_ROOT}/lib")
     set(CAFFE_INCLUDE_DIRS "$ENV{OPENPOSE_ROOT}/include")
     set(CAFFE_LIBRARIES "$ENV{OPENPOSE_ROOT}/lib")
-
+    set(NUMPY_INCLUDE_DIRS "/usr/local/lib/python3.5/dist-packages/numpy/core/include")
 else()
     message(FATAL_ERROR "Environment variable OPENPOSE_ROOT is not set. Please set and point to openpose installation folder")
 endif()
@@ -82,6 +82,7 @@ include_directories(${CAFFE_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories(${NUMPY_INCLUDE_DIRS})
 
 feature_summary(WHAT ALL)
 
