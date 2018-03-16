@@ -29,7 +29,6 @@ int initialize_array()
     {
         init = true;
         import_array1(0);
-        bpy::numeric::array::set_module_and_type("numpy", "ndarray");
         return 0;
     }
     return 1;
