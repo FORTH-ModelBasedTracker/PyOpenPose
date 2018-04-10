@@ -29,7 +29,9 @@ int initialize_array()
     {
         init = true;
         import_array1(0);
+#if BOOST_VERSION < 106500
         bpy::numeric::array::set_module_and_type("numpy", "ndarray");
+#endif
         return 0;
     }
     return 1;

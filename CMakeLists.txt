@@ -51,12 +51,18 @@ find_package(OpenCV 3 REQUIRED)
 find_package(Doxygen)
 
 ### for python 2 use this:
-find_package(Boost COMPONENTS system python-py27 REQUIRED)
-find_package(PythonLibs 2.7 EXACT REQUIRED) 
+#find_package(Boost COMPONENTS system python-py27 REQUIRED)
+#find_package(PythonLibs 2.7 EXACT REQUIRED) 
 
 ### for python 3 use this:
-#find_package(Boost COMPONENTS system python-py35 REQUIRED)
-#find_package(PythonLibs 3 EXACT REQUIRED) 
+find_package(Boost 1.63.0)
+if( Boost_FOUND ) #new syntax is needed
+    find_package(Boost COMPONENTS system python3 REQUIRED)
+else()
+    find_package(Boost COMPONENTS system python-py35 REQUIRED)
+endif()
+
+find_package(PythonLibs 3 EXACT REQUIRED) 
 
 
 
@@ -69,7 +75,6 @@ if(DEFINED ENV{OPENPOSE_ROOT})
     set(OPENPOSE_LIBRARIES "$ENV{OPENPOSE_ROOT}/lib")
     set(CAFFE_INCLUDE_DIRS "$ENV{OPENPOSE_ROOT}/include")
     set(CAFFE_LIBRARIES "$ENV{OPENPOSE_ROOT}/lib")
-
 else()
     message(FATAL_ERROR "Environment variable OPENPOSE_ROOT is not set. Please set and point to openpose installation folder")
 endif()
