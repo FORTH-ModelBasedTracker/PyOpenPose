@@ -55,12 +55,13 @@ find_package(Doxygen)
 #find_package(PythonLibs 2.7 EXACT REQUIRED) 
 
 ### for python 3 use this:
-find_package(Boost 1.63.0 Minimum)
+find_package(Boost 1.63.0)
 if( Boost_FOUND ) #new syntax is needed
     find_package(Boost COMPONENTS system python3 REQUIRED)
 else()
     find_package(Boost COMPONENTS system python-py35 REQUIRED)
 endif()
+
 find_package(PythonLibs 3 EXACT REQUIRED) 
 
 
