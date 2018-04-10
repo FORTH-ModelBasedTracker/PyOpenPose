@@ -33,7 +33,7 @@ Add the folder containing PyOpenPose.so to your PYTHONPATH.
 
 ### Building the library for python3 or python2
 
- - Open CMakeLists.txt and uncomment the corresponding two lines for python discivery
+ - Set WITH_PYTHON3 flag in cmake to True (i.e with cmake-gui).
  - rebuild project
 
 ### Testing
