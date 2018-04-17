@@ -151,7 +151,7 @@ void OpenPoseWrapper::detectFace(const cv::Mat &rgb) {
     cv::Mat fr = this->faceRects.reshape(4,faceRects.rows); // stupid cv::Mat iterator cannot iterate over rows.
     std::transform(faceRectsOP.begin(), faceRectsOP.end(), fr.begin<cv::Vec4i>(), [](const op::Rectangle<float> &r) -> cv::Vec4i { return cv::Vec4i(r.x, r.y, r.width, r.height);});
 
-    membersPtr->faceExtractor.forwardPass(faceRectsOP, rgb, 1.0f);
+    membersPtr->faceExtractor.forwardPass(faceRectsOP, rgb);
 }
 
 void OpenPoseWrapper::detectFace(const cv::Mat &rgb, const cv::Mat &faceRects)
@@ -171,7 +171,7 @@ void OpenPoseWrapper::detectFace(const cv::Mat &rgb, const cv::Mat &faceRects)
     std::transform(fr.begin<cv::Vec4i>(), fr.end<cv::Vec4i>(), faceRectsOP.begin(),
                    [](const cv::Vec4i &r) -> op::Rectangle<float> { return op::Rectangle<float>(r[0], r[1], r[2], r[3]);});
 
-    membersPtr->faceExtractor.forwardPass(faceRectsOP, rgb, 1.0f);
+    membersPtr->faceExtractor.forwardPass(faceRectsOP, rgb);
 }
 
 void OpenPoseWrapper::detectHands(const cv::Mat &rgb) {
@@ -189,7 +189,7 @@ void OpenPoseWrapper::detectHands(const cv::Mat &rgb) {
                    [](const std::array<op::Rectangle<float>, 2> &r) -> cv::Vec8i
                    { return cv::Vec8i(r[0].x, r[0].y, r[0].width, r[0].height, r[1].x, r[1].y, r[1].width, r[1].height); });
 
-    membersPtr->handExtractor.forwardPass(handRectsOP, rgb, 1.0f);
+    membersPtr->handExtractor.forwardPass(handRectsOP, rgb);
 }
 
 void OpenPoseWrapper::detectHands(const cv::Mat &rgb, const cv::Mat &handRects)
@@ -210,7 +210,7 @@ void OpenPoseWrapper::detectHands(const cv::Mat &rgb, const cv::Mat &handRects)
                    [](const cv::Vec8i &r) -> std::array<op::Rectangle<float>, 2>
                    { return std::array<op::Rectangle<float>, 2>{op::Rectangle<float>(r[0], r[1], r[2], r[3]), op::Rectangle<float>(r[4], r[5], r[6], r[7])};});
 
-    membersPtr->handExtractor.forwardPass(handRectsOP, rgb, 1.0f);
+    membersPtr->handExtractor.forwardPass(handRectsOP, rgb);
 }
 
 cv::Mat OpenPoseWrapper::render(const cv::Mat &rgb)
@@ -232,11 +232,11 @@ cv::Mat OpenPoseWrapper::render(const cv::Mat &rgb)
 
     if(withFace){
         const auto faceKeypoints = membersPtr->faceExtractor.getFaceKeypoints();
-        membersPtr->faceRenderer.renderFace(outputArray, faceKeypoints);
+        membersPtr->faceRenderer.renderFace(outputArray, faceKeypoints, 1.0);
     }
     if(withHands) {
         const auto handKeypoints = membersPtr->handExtractor.getHandKeypoints();
-        membersPtr->handRenderer.renderHand(outputArray, handKeypoints);
+        membersPtr->handRenderer.renderHand(outputArray, handKeypoints, 1.0);
     }
 
     auto outputImage = membersPtr->opOutputToCvMat.formatToCvMat(outputArray);
