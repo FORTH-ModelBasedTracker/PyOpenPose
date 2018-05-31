@@ -16,7 +16,7 @@ For running the example scripts make sure OPENPOSE_ROOT contains a models folder
 __Note:__ Openpose lib is under heavy development and the API changes very often. 
 Some API changes will break PyOpenPose. I try to upgrade as soon as possible but I am usually a few days behind. 
 Openning an issue helps to speed-up the proccess. 
-Current PyOpenPose version is built with [openpose commit f430a79](https://github.com/CMU-Perceptual-Computing-Lab/openpose/commit/f430a7990df915ef92852e4b7744e06eecbd2b61)
+Current PyOpenPose version is built with [openpose commit 62ad073](https://github.com/CMU-Perceptual-Computing-Lab/openpose/commit/62ad073743491d056ef20b716eab7e3c3513c1fa)
 
 __Note:__ PyOpenPose requires __opencv3.x__. You will have to build openpose with opencv3 as well.
 
