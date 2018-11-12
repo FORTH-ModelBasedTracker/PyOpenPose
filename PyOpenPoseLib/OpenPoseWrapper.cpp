@@ -28,18 +28,18 @@ struct OpenPoseWrapper::PrivateData
     PrivateData(const op::Point<int> &netInputSize, const op::Point<int> &netInputSizeFaceAndHands,
                 const op::Point<int> &outputSize, const op::PoseModel &poseModel,
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
-                const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale, int gpuId):
-            poseExtractorCaffe{poseModel, modelFolder, gpuId, heatMapTypes, heatMapScale},
+                const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale, int gpuId, bool logging):
+            poseExtractorCaffe{poseModel, modelFolder, gpuId, heatMapTypes, heatMapScale, logging},
             poseRenderer{poseModel, nullptr, 0.05, true, blendAlpha},
             scaleAndSizeExtractor{netInputSize, outputSize, numScales, scaleGap},
 
-            faceExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, gpuId, heatMapTypes, heatMapScale},
+            faceExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, gpuId, heatMapTypes, heatMapScale, logging},
             faceRenderer{0.4},
             faceDetector(poseModel),
 
             handDetector(poseModel),
             handRenderer{0.2},
-            handExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, gpuId, 1, 0.4, heatMapTypes, heatMapScale}
+            handExtractor{netInputSizeFaceAndHands, netInputSizeFaceAndHands, modelFolder, gpuId, 1, 0.4, heatMapTypes, heatMapScale, logging}
 
     {}
 
@@ -108,7 +108,7 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
     membersPtr = std::shared_ptr<PrivateData>(new PrivateData(netInputSize, netInputSizeFaceAndHands,
                                                               outputSize, poseModel, modelFolder,
                                                               numScales, scaleGap, blendAlpha,
-                                                              hmt, (op::ScaleMode)scaleMode, gpuId));
+                                                              hmt, (op::ScaleMode)scaleMode, gpuId, logLevel < 255));
 
     // Step 4 - Initialize resources on desired thread (in this case single thread, i.e. we init resources here)
     membersPtr->poseExtractorCaffe.initializationOnThread();
