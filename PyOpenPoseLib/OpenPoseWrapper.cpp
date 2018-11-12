@@ -29,7 +29,7 @@ struct OpenPoseWrapper::PrivateData
                 const op::Point<int> &outputSize, const op::PoseModel &poseModel,
                 const std::string &modelFolder, int numScales, float scaleGap, float blendAlpha,
                 const std::vector<op::HeatMapType> &heatMapTypes, const op::ScaleMode &heatMapScale, int gpuId, bool logging):
-            poseExtractorCaffe{poseModel, modelFolder, gpuId, heatMapTypes, heatMapScale, logging},
+            poseExtractorCaffe{poseModel, modelFolder, gpuId, heatMapTypes, heatMapScale, false, logging},
             poseRenderer{poseModel, nullptr, 0.05, true, blendAlpha},
             scaleAndSizeExtractor{netInputSize, outputSize, numScales, scaleGap},
 
