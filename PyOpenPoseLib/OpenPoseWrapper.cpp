@@ -87,6 +87,8 @@ OpenPoseWrapper::OpenPoseWrapper(const cv::Size &netPoseSize, const cv::Size &ne
         poseModel = op::PoseModel::MPI_15;
     else if (model == "MPI_4_layers")
         poseModel = op::PoseModel::MPI_15_4;
+    else if (model == "BODY_25")
+        poseModel = op::PoseModel::BODY_25;
     else
     {
         op::error("String does not correspond to any model (COCO, MPI, MPI_4_layers)", __LINE__, __FUNCTION__, __FILE__);
