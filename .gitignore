@@ -24,3 +24,4 @@ cmake-build-*
 scripts/.ipynb_checkpoints
 *.pyc
 build
+.vscode

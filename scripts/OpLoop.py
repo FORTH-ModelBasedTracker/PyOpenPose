@@ -36,7 +36,8 @@ def run():
     # with_face = with_hands = False
     # op = OP.OpenPose((656, 368), (368, 368), (1280, 720), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0,
     #                  download_heatmaps, OP.OpenPose.ScaleMode.ZeroToOne, with_face, with_hands)
-    op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
+    # op = OP.OpenPose((320, 240), (240, 240), (640, 480), "COCO", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
+    op = OP.OpenPose((368, 368), (240, 240), (1280, 800), "BODY_25", OPENPOSE_ROOT + os.sep + "models" + os.sep, 0, download_heatmaps)
 
     actual_fps = 0
     paused = False
