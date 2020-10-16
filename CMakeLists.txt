@@ -50,11 +50,11 @@ find_package(CUDA REQUIRED)
 find_package(OpenCV 3 REQUIRED)
 find_package(Doxygen)
 
-set(WITH_PYTHON3 False CACHE BOOL "Use Python3") 
-
 ### for python 3 use this:
-find_package(Boost 1.63.0)
-if( Boost_FOUND ) #new syntax is needed
+set(WITH_PYTHON3 False CACHE BOOL "Use Python3") 
+set(WITH_SYSTEMBOOST True CACHE BOOL "Boost from deb package")
+
+if( NOT WITH_SYSTEMBOOST) #boost package syntax
     if( WITH_PYTHON3 )
         find_package(Boost COMPONENTS system python3 REQUIRED)
     else()
